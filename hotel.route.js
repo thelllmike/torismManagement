@@ -99,32 +99,26 @@ hotelRoutes.route('/hotelDelete/:id').delete(function(req,res){
 
 
 
-
-// Define a POST route at '/login'
-hotelRoutes.route('/login').post(function (req, res) {
-    // Retrieve NIC and password from the request body
+hotelRoutes.route('/login').post(function (req, res){
     let email = req.body.email;
     let password = req.body.password;
-    // Log the login details for debugging purposes
-    console.log("Your Login Details " + email + " " + password);
-    // Use the 'findOne' method of the 'Customer' model to find a customer with the specified NIC and password
-    Hotel.findOne({ email: email, password: password }, function (err, hotel) {
-        // If there is an error, respond with a 500 Internal Server Error message
-        if (err) {
-            console.log(err);
-            res.status(500).send("Internal Server Error");
-            // If no customer is found with the specified NIC and password, respond with a 401 Unauthorized message
-        } else if (!hotel) {
-            res.status(401).send("Invalid Credentials");
-            // If a customer is found with the specified NIC and password, respond with a 200 OK message and the customer object in JSON format
-        } else {
-            res.status(200).send({
-                message: "Successful Login",
-                hotel: hotel
-            });
-        }
-    });
-});
 
+    let hotel = new Hotel(req.body);
+
+    Hotel.findOne({$and:[{email : email},{password : password}]})
+        .then(hotel => {
+            if(hotel){
+                hotel.name = req.body.name;
+                res.status(200).send({
+                    message: "Successful Login"
+                });
+            }
+            else{
+                res.status(200).send({
+                    message: "User Not Found"
+                });
+            }
+        })
+});
 
 module.exports = hotelRoutes;

@@ -124,27 +124,7 @@ guideRoutes.route('/guideDelete/:id').delete(function(req,res){
 });
 
 
-guideRoutes.route('/login').post(function (req, res){
-    let email = req.body.email;
-    let password = req.body.password;
 
-    let guide = new Guide(req.body);
-
-    Guide.findOne({$and:[{email : email},{password : password}]})
-        .then(guide => {
-            if(guide){
-                guide.name = req.body.name;
-                res.status(200).send({
-                    message: "Successful Login"
-                });
-            }
-            else{
-                res.status(200).send({
-                    message: "User Not Found"
-                });
-            }
-        })
-});
 
 
 // // Define a POST route at '/login'
