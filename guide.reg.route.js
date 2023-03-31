@@ -28,15 +28,15 @@ guideRoutes.route('/guideAdd').post(function (req,res){
 //     res.send({Status: "Error",data :error});
 // })
 
-guideRoutes.route('/upload').post(async (req, res) => {
-    try {
-        const {base64} = req.body;
-        await Image.create({base64});
-        res.status(200).json({'guide': 'new guide is added successfully'});
-    } catch (error) {
-        res.status(400).send('Unable to save to database');
-    }
-});
+// guideRoutes.route('/upload').post(async (req, res) => {
+//     try {
+//         const {base64} = req.body;
+//         await Image.create({base64});
+//         res.status(200).json({'guide': 'new guide is added successfully'});
+//     } catch (error) {
+//         res.status(400).send('Unable to save to database');
+//     }
+// });
 
 
 //get all details
@@ -124,33 +124,54 @@ guideRoutes.route('/guideDelete/:id').delete(function(req,res){
 });
 
 
-
-
-// Define a POST route at '/login'
-guideRoutes.route('/login').post(function (req, res) {
-    // Retrieve NIC and password from the request body
-    let nic = req.body.nic;
+guideRoutes.route('/login').post(function (req, res){
+    let email = req.body.email;
     let password = req.body.password;
-    // Log the login details for debugging purposes
-    console.log("Your Login Details " + nic + " " + password);
-    // Use the 'findOne' method of the 'Customer' model to find a customer with the specified NIC and password
-    Customer.findOne({ nic: nic, password: password }, function (err, customer) {
-        // If there is an error, respond with a 500 Internal Server Error message
-        if (err) {
-            console.log(err);
-            res.status(500).send("Internal Server Error");
-            // If no customer is found with the specified NIC and password, respond with a 401 Unauthorized message
-        } else if (!customer) {
-            res.status(401).send("Invalid Credentials");
-            // If a customer is found with the specified NIC and password, respond with a 200 OK message and the customer object in JSON format
-        } else {
-            res.status(200).send({
-                message: "Successful Login",
-                customer: customer
-            });
-        }
-    });
+
+    let guide = new Guide(req.body);
+
+    Guide.findOne({$and:[{email : email},{password : password}]})
+        .then(guide => {
+            if(guide){
+                guide.name = req.body.name;
+                res.status(200).send({
+                    message: "Successful Login"
+                });
+            }
+            else{
+                res.status(200).send({
+                    message: "User Not Found"
+                });
+            }
+        })
 });
+
+
+// // Define a POST route at '/login'
+// guideRoutes.route('/login').post(function (req, res) {
+//     // Retrieve NIC and password from the request body
+//     let nic = req.body.nic;
+//     let password = req.body.password;
+//     // Log the login details for debugging purposes
+//     console.log("Your Login Details " + nic + " " + password);
+//     // Use the 'findOne' method of the 'Customer' model to find a customer with the specified NIC and password
+//     Customer.findOne({ nic: nic, password: password }, function (err, customer) {
+//         // If there is an error, respond with a 500 Internal Server Error message
+//         if (err) {
+//             console.log(err);
+//             res.status(500).send("Internal Server Error");
+//             // If no customer is found with the specified NIC and password, respond with a 401 Unauthorized message
+//         } else if (!customer) {
+//             res.status(401).send("Invalid Credentials");
+//             // If a customer is found with the specified NIC and password, respond with a 200 OK message and the customer object in JSON format
+//         } else {
+//             res.status(200).send({
+//                 message: "Successful Login",
+//                 customer: customer
+//             });
+//         }
+//     });
+// });
 
 
 module.exports = guideRoutes;
